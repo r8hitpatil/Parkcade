@@ -2,7 +2,6 @@ import { prisma } from "@/server";
 import { fgaClient } from "@/utils/openFG";
 import { RequestHandler } from "express";
 
-
 export const getAllLocations: RequestHandler = async (req, res) => {
   try {
     const allLocations = await prisma.location.findMany({});
@@ -76,6 +75,17 @@ export const createCoords: RequestHandler = async (req, res) => {
 export const updateCoords: RequestHandler = async (req, res) => {
   try {
     const { id, location } = req.body;
+    if (!id || !location) {
+      return res.status(400).json({ message: "Enter complete details" });
+    }
+    const canEdit = await fgaClient.check({
+      user: `user:${req.user!.id}`,
+      relation: "can_edit",
+      object: `location:${id}`,
+    });
+    if (!canEdit.allowed) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
     const updateLoc = await prisma.location.update({
       where: {
         id,
@@ -88,6 +98,34 @@ export const updateCoords: RequestHandler = async (req, res) => {
       return res.status(401).json({ message: "Unable to update user" });
     }
     return res.status(200).json({ message: "Successfully updated", updateLoc });
+  } catch (error) {
+    return res.status(500).json({ message: "Something went wrong" });
+  }
+};
+
+export const deleteLoc: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.body;
+    if (!id) {
+      return res.status(400).json({ message: "Enter complete details" });
+    }
+    const canDelete = await fgaClient.check({
+      user: `user:${req.user!.id}`,
+      relation: "can_delete",
+      object: `location:${id}`,
+    });
+    if (!canDelete.allowed) {
+      return res.status(403).json({ message: "Unauthorized access" });
+    }
+    const deleteLocation = await prisma.location.delete({
+      where: {
+        id,
+      },
+    });
+    if (!deleteLocation) {
+      return res.status(401).json({ message: "Unable to update user" });
+    }
+    return res.status(200).json({ message: "Successfully deletion", deleteLocation }); 
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }

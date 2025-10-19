@@ -1,4 +1,4 @@
-import { createCoords, getAllLocations, getLocations, updateCoords } from '@/controller/coord.controller';
+import { createCoords, deleteLoc, getAllLocations, getLocations, updateCoords } from '@/controller/coord.controller';
 import { verifyUserToken } from '@/middleware/auth.middleware';
 
 import Router from 'express';
@@ -9,6 +9,7 @@ route.post('/location',verifyUserToken,createCoords);
 route.get('/locations',verifyUserToken,getLocations);
 route.get('/all-locations',verifyUserToken,getAllLocations);
 route.post('/update-location',verifyUserToken,updateCoords);
+route.post('/delete-location',verifyUserToken,deleteLoc);
 
 const mapRoutes = route;
 
