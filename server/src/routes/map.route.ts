@@ -1,4 +1,4 @@
-import { createCoords, deleteLoc, getAllLocations, getLocations, updateCoords } from '@/controller/coord.controller';
+import { createCoords, deleteLoc, getAllLocations, getLocations, roleEdit, updateCoords } from '@/controller/coord.controller';
 import { verifyUserToken } from '@/middleware/auth.middleware';
 
 import Router from 'express';
@@ -10,6 +10,7 @@ route.get('/locations',verifyUserToken,getLocations);
 route.get('/all-locations',verifyUserToken,getAllLocations);
 route.post('/update-location',verifyUserToken,updateCoords);
 route.post('/delete-location',verifyUserToken,deleteLoc);
+route.post('/access',verifyUserToken,roleEdit);
 
 const mapRoutes = route;
 

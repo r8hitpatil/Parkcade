@@ -125,8 +125,52 @@ export const deleteLoc: RequestHandler = async (req, res) => {
     if (!deleteLocation) {
       return res.status(401).json({ message: "Unable to update user" });
     }
-    return res.status(200).json({ message: "Successfully deletion", deleteLocation }); 
+    return res
+      .status(200)
+      .json({ message: "Successfully deletion", deleteLocation });
   } catch (error) {
     return res.status(500).json({ message: "Something went wrong" });
   }
+};
+
+export const roleEdit: RequestHandler = async (req, res) => {
+  try {
+    const { location, id } = req.body;
+    if (!location || !id) {
+      return res.status(400).json({ message: "Enter complete credentials" });
+    }
+    const canAllow = await fgaClient.check({
+      user: `user:${req.user!.id}`,
+      relation: "owner",
+      object: `location:${location}`,
+    });
+    if (!canAllow.allowed) {
+      return res
+        .status(400)
+        .json({ message: "Unauthorized access (Cannot access editor role)" });
+    }
+    const editor = await fgaClient.write({
+      writes: [
+        {
+          user: `user:${id}`,
+          relation: "editor",
+          object: `location:${location}`,
+        },
+      ],
+    });
+    if (!editor) {
+      return res.status(400).json({ message: "Unable to authorize role." });
+    }
+    return res.status(200).json({ message: "Editor Role authorized.", canAllow });
+  } catch (error: unknown) {
+  // Code to handle the error
+  if (error instanceof Error) {
+    console.error("An error occurred:", error.message);
+  } else {
+    console.error("An unknown error occurred:", error);
+  }
+} finally {
+  // Optional: Code that always runs, regardless of whether an error occurred
+  console.log("This block always executes.");
+}
 };
