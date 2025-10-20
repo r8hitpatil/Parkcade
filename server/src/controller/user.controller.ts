@@ -2,6 +2,7 @@ import { RequestHandler } from "express";
 import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
 import { prisma } from "@/server";
 import jwt from 'jsonwebtoken'
+import parsedEnv from "@/utils/env";
 
 const salt = genSaltSync(10);
 
@@ -22,7 +23,6 @@ export const signupUser:RequestHandler = async (req, res) => {
     if(!newUser){
         return res.status(401).json({ message : "Failed to create user" });
     }
-
     return res.status(201).json({ message : "User created", data: newUser });
   } catch (error: unknown) {
     console.error('Error',error);
@@ -53,7 +53,7 @@ export const loginUser:RequestHandler = async (req ,res) => {
       id:id,
       email:email
     },
-      "rohit@123"//use meta.env
+      parsedEnv.TOKEN_KEY//use meta.env
     ,{
       expiresIn : "1h"
     })

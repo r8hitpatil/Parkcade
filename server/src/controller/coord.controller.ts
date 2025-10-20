@@ -12,7 +12,7 @@ export const getAllLocations: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Error fetching locations:", error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -24,7 +24,7 @@ export const getLocations: RequestHandler = async (req, res) => {
     }
     const sortedLocations = await fgaClient.listObjects({
       user: `user:${req.user!.id}`,
-      relation: "owner",
+      relation: "can_edit",
       type: "location",
     });
     const allowedFields = sortedLocations.objects.map(
@@ -35,7 +35,7 @@ export const getLocations: RequestHandler = async (req, res) => {
     );
     return res.status(200).json({ message: "Locations are : ", allowed });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -68,7 +68,7 @@ export const createCoords: RequestHandler = async (req, res) => {
       .json({ message: "Location created", data: newCoord });
   } catch (error) {
     console.log(error as Error);
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -99,7 +99,7 @@ export const updateCoords: RequestHandler = async (req, res) => {
     }
     return res.status(200).json({ message: "Successfully updated", updateLoc });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -129,7 +129,7 @@ export const deleteLoc: RequestHandler = async (req, res) => {
       .status(200)
       .json({ message: "Successfully deletion", deleteLocation });
   } catch (error) {
-    return res.status(500).json({ message: "Something went wrong" });
+    return res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -162,15 +162,7 @@ export const roleEdit: RequestHandler = async (req, res) => {
       return res.status(400).json({ message: "Unable to authorize role." });
     }
     return res.status(200).json({ message: "Editor Role authorized.", canAllow });
-  } catch (error: unknown) {
-  // Code to handle the error
-  if (error instanceof Error) {
-    console.error("An error occurred:", error.message);
-  } else {
-    console.error("An unknown error occurred:", error);
+  } catch(error){
+    return res.status(500).json({ message : "Server error" });
   }
-} finally {
-  // Optional: Code that always runs, regardless of whether an error occurred
-  console.log("This block always executes.");
 }
-};
