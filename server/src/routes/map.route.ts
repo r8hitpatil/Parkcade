@@ -11,6 +11,7 @@ route.get('/all-locations',verifyUserToken,getAllLocations);
 route.post('/update-location',verifyUserToken,updateCoords);
 route.post('/delete-location',verifyUserToken,deleteLoc);
 route.post('/access',verifyUserToken,roleEdit);
+route.get('/eligible-users',verifyUserToken,);
 
 const mapRoutes = route;
 

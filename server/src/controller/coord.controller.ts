@@ -166,3 +166,15 @@ export const roleEdit: RequestHandler = async (req, res) => {
     return res.status(500).json({ message : "Server error" });
   }
 }
+
+export const eligibleUser:RequestHandler = async (req,res) => {
+  try {
+    const canAllow = await fgaClient.check({
+      user: `user:${req.user!.id}`,
+      relation: "owner",
+      object: `location:${location}`,
+    });
+  } catch (error) {
+    
+  }
+}

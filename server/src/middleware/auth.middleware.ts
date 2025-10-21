@@ -1,8 +1,9 @@
+import { env } from "@/utils/env";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
 export const verifyUserToken = async (req:Request , res:Response , next:NextFunction) => {
-    const JWT = "rohit@123";
+    const JWT = env.JWT_TOKEN;
 
     const token = req.cookies.token;
 

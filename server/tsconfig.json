@@ -4,7 +4,7 @@
     // File Layout
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "commonjs",
+    "module": "nodenext",
     "target": "es2020",
     "types": ["node"],
     "baseUrl": ".",
@@ -15,6 +15,7 @@
       "@middleware/*":["src/middleware/*"],
       "@utils/*":["src/utils/*"]
     },
+    "moduleResolution": "nodenext",
 
     // Other Outputs
     "sourceMap": true,
@@ -35,6 +36,6 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/**/*.ts"],
+  "include": ["src/**/*.ts", "src/utils/env.ts"],
   "exclude": ["node_modules"]
 }
