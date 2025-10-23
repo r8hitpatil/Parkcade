@@ -7,6 +7,8 @@ declare global {
         id: string;
         email: string;
       };
+      access?,
+      ownerAccess
     }
   }
 }

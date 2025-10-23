@@ -74,17 +74,13 @@ export const createCoords: RequestHandler = async (req, res) => {
 
 export const updateCoords: RequestHandler = async (req, res) => {
   try {
-    const { id, location } = req.body;
-    if (!id || !location) {
+    const { id } = req.params;
+    const { location } = req.body;
+    if (!location || !id) {
       return res.status(400).json({ message: "Enter complete details" });
     }
-    const canEdit = await fgaClient.check({
-      user: `user:${req.user!.id}`,
-      relation: "can_edit",
-      object: `location:${id}`,
-    });
-    if (!canEdit.allowed) {
-      return res.status(403).json({ message: "Unauthorized access" });
+    if(!req.access){
+      return res.status(403).json({ message : "Unauthorized access" })
     }
     const updateLoc = await prisma.location.update({
       where: {
@@ -105,16 +101,11 @@ export const updateCoords: RequestHandler = async (req, res) => {
 
 export const deleteLoc: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id } = req.params;
     if (!id) {
       return res.status(400).json({ message: "Enter complete details" });
     }
-    const canDelete = await fgaClient.check({
-      user: `user:${req.user!.id}`,
-      relation: "can_delete",
-      object: `location:${id}`,
-    });
-    if (!canDelete.allowed) {
+    if (!req.access) {
       return res.status(403).json({ message: "Unauthorized access" });
     }
     const deleteLocation = await prisma.location.delete({
@@ -135,46 +126,71 @@ export const deleteLoc: RequestHandler = async (req, res) => {
 
 export const roleEdit: RequestHandler = async (req, res) => {
   try {
-    const { location, id } = req.body;
-    if (!location || !id) {
+    const { id } = req.params;
+    const {userId } = req.body;
+    if (!userId || !id) {
       return res.status(400).json({ message: "Enter complete credentials" });
     }
-    const canAllow = await fgaClient.check({
-      user: `user:${req.user!.id}`,
-      relation: "owner",
-      object: `location:${location}`,
-    });
-    if (!canAllow.allowed) {
+    if (!req.ownerAccess) {
       return res
-        .status(400)
-        .json({ message: "Unauthorized access (Cannot access editor role)" });
+        .status(403)
+        .json({ message: "Unauthorized access" });
     }
     const editor = await fgaClient.write({
       writes: [
         {
-          user: `user:${id}`,
+          user: `user:${userId}`,
           relation: "editor",
-          object: `location:${location}`,
+          object: `location:${id}`,
         },
       ],
     });
     if (!editor) {
       return res.status(400).json({ message: "Unable to authorize role." });
     }
-    return res.status(200).json({ message: "Editor Role authorized.", canAllow });
-  } catch(error){
-    return res.status(500).json({ message : "Server error" });
-  }
-}
-
-export const eligibleUser:RequestHandler = async (req,res) => {
-  try {
-    const canAllow = await fgaClient.check({
-      user: `user:${req.user!.id}`,
-      relation: "owner",
-      object: `location:${location}`,
-    });
+    return res
+      .status(200)
+      .json({ message: "Editor Role authorized.", editor });
   } catch (error) {
-    
+    return res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const removeEditorAccess:RequestHandler = async(req,res) => {
+  try {
+    const { id } = req.params;
+    const {userId } = req.body;
+    if (!userId || !id) {
+      return res.status(400).json({ message: "Enter complete credentials" });
+    }
+    if (!req.ownerAccess) {
+      return res
+        .status(403)
+        .json({ message: "Unauthorized access" });
+    }
+    const viewer = await fgaClient.write({
+      writes: [
+        {
+          user: `user:${userId}`,
+          relation: "viewer",
+          object: `location:${id}`,
+        },
+      ],
+      deletes: [
+        {
+          user: `user:${userId}`,
+          relation: "editor",
+          object: `location:${id}`,
+        },
+      ],
+    });
+    if (!viewer) {
+      return res.status(400).json({ message: "Unable to authorize role." });
+    }
+    return res
+      .status(200)
+      .json({ message: "Authorized to role viewer", viewer });
+  } catch (error) {
+    return res.status(500).json({ message: "Server error" });
   }
 }

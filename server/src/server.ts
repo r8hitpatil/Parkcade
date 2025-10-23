@@ -12,7 +12,7 @@ export const prisma = new PrismaClient();
 
 app.use(express.json());
 app.use(cookieParser());
-app.use('/test',userRoutes);
-app.use('/tester',mapRoutes)
+app.use('/user',userRoutes);
+app.use('/loc',mapRoutes)
 
 export default app;
