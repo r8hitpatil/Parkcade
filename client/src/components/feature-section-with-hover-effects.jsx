@@ -13,48 +13,51 @@ import {
 export function FeaturesSectionWithHoverEffects() {
   const features = [
     {
-      title: "Built for developers",
+      title: "Real-Time Parking Availability",
       description:
-        "Built for engineers, developers, dreamers, thinkers and doers.",
-      icon: <IconTerminal2 />,
-    },
-    {
-      title: "Ease of use",
-      description:
-        "It's as easy as using an Apple, and as expensive as buying one.",
-      icon: <IconEaseInOut />,
-    },
-    {
-      title: "Pricing like no other",
-      description:
-        "Our prices are best in the market. No cap, no lock, no credit card required.",
-      icon: <IconCurrencyDollar />,
-    },
-    {
-      title: "100% Uptime guarantee",
-      description: "We just cannot be taken down by anyone.",
+        "Instantly view up-to-date information on available parking spots near your destination, helping you save time and avoid unnecessary driving.",
       icon: <IconCloud />,
     },
     {
-      title: "Multi-tenant Architecture",
-      description: "You can simply share passwords instead of buying new seats",
+      title: "Seamless Booking Experience",
+      description:
+        "Reserve your parking spot in advance with just a few taps. Enjoy peace of mind knowing your space is guaranteed when you arrive.",
+      icon: <IconAdjustmentsBolt />,
+    },
+    {
+      title: "Transparent & Affordable Pricing",
+      description:
+        "Access competitive rates with no hidden fees. Choose from hourly or daily plans and pay securely through the app.",
+      icon: <IconCurrencyDollar />,
+    },
+    {
+      title: "Reliable Service, Anytime",
+      description:
+        "Parkcade ensures you have access to parking 24/7, with a robust platform designed for maximum uptime and reliability.",
+      icon: <IconCloud />,
+    },
+    {
+      title: "Multi-City Coverage",
+      description:
+        "Find and book parking in multiple cities, whether you’re at home or traveling. Parkcade grows with your journey.",
       icon: <IconRouteAltLeft />,
     },
     {
       title: "24/7 Customer Support",
       description:
-        "We are available a 100% of the time. Atleast our AI Agents are.",
+        "Our dedicated support team is always available to assist you with any parking issues or questions, day or night.",
       icon: <IconHelp />,
     },
     {
-      title: "Money back guarantee",
+      title: "Easy Cancellations & Refunds",
       description:
-        "If you donot like EveryAI, we will convince you to like us.",
-      icon: <IconAdjustmentsBolt />,
+        "Change of plans? Cancel your booking anytime with a simple tap and receive instant refunds, hassle-free.",
+      icon: <IconEaseInOut />,
     },
     {
-      title: "And everything else",
-      description: "I just ran out of copy ideas. Accept my sincere apologies",
+      title: "Secure & Trusted Platform",
+      description:
+        "Your data and payments are protected with industry-leading security, so you can park with confidence every time.",
       icon: <IconHeart />,
     },
   ];
@@ -95,14 +98,14 @@ const Feature = ({
       </div>
       <div className="text-lg font-bold mb-2 relative z-10 px-10">
         <div
-          className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-300 dark:bg-neutral-700 group-hover/feature:bg-blue-500 transition-all duration-200 origin-center" />
+          className="absolute left-0 inset-y-0 h-6 group-hover/feature:h-8 w-1 rounded-tr-full rounded-br-full bg-neutral-300 group-hover/feature:bg-blue-500 dark:bg-neutral-700 dark:group-hover/feature:bg-blue-900 transition-all duration-200 origin-center"/>
         <span
-          className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-neutral-800 dark:text-neutral-100">
+          className="group-hover/feature:translate-x-2 transition duration-200 inline-block text-neutral-800 dark:text-neutral-100 font-oddlini">
           {title}
         </span>
       </div>
       <p
-        className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs relative z-10 px-10">
+        className="text-sm text-neutral-600 dark:text-neutral-300 max-w-xs relative z-10 px-10 font-oddlini-light tracking-wider">
         {description}
       </p>
     </div>

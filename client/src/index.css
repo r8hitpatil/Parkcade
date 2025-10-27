@@ -67,7 +67,19 @@
   65%, 85% {
     transform: translateZ(0) rotate(270deg);}
   100% {
-    transform: translateZ(0) rotate(360deg);}}}
+    transform: translateZ(0) rotate(360deg);}}
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --font-geist-mono: var(----font-geist-mono);
+  --font-geist-sans: var(----font-geist-sans);
+  --radius: var(----radius);
+  --animate-shiny-text: shiny-text 8s infinite;
+  @keyframes shiny-text {
+  0%, 90%, 100% {
+    background-position: calc(-100% - var(--shiny-width)) 0;}
+  30%, 60% {
+    background-position: calc(100% + var(--shiny-width)) 0;}}}
 
 :root {
   --radius: 0.625rem;
@@ -107,6 +119,9 @@
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
+  --destructive-foreground: oklch(1 0 0);
+  --font-geist-sans: "Geist Sans", sans-serif;
+  --font-geist-mono: "Geist Mono", monospace;
 }
 
 .dark {
@@ -146,6 +161,7 @@
   --color-3: oklch(69.6% 0.165 251);
   --color-4: oklch(80.2% 0.134 225);
   --color-5: oklch(90.7% 0.231 133);
+  --destructive-foreground: oklch(1 0 0);
 }
 
 @layer base {
@@ -178,6 +194,20 @@
   font-style: normal;
   font-display: swap;
 }
+@font-face {
+  font-family: "Oddlini";
+  src: url("/fonts/oddlini-bold-ultra-expanded.ttf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Oddlini-Light";
+  src: url("/fonts/oddlini-light.ttf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
 
 .font-belfast {
   font-family: "BelfastGrotesk", system-ui, sans-serif !important;
@@ -188,8 +218,18 @@
 .font-uber-medium {
   font-family: "Uber-Medium", system-ui, sans-serif !important;
 }
+.font-oddlini {
+  font-family: "Oddlini", system-ui, sans-serif !important;
+}
+.font-oddlini-light {
+  font-family: "Oddlini-Light", system-ui, sans-serif !important;
+}
 
 .leaflet-container {
   height: 400px; /* or 100vh or whatever you want */
   width: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
 }

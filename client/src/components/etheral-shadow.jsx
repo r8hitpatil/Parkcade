@@ -1,6 +1,9 @@
 "use client";
 import React, { useRef, useId, useEffect } from "react";
 import { animate, useMotionValue } from "framer-motion";
+import { AnimatedShinyText } from "./ui/animated-shiny-text";
+import { cn } from "@/lib/utils";
+import { ArrowRightIcon } from "lucide-react";
 
 function mapRange(value, fromLow, fromHigh, toLow, toHigh) {
   if (fromLow === fromHigh) {
@@ -32,10 +35,10 @@ export function Etheral({
   const hueRotateAnimation = useRef(null);
 
   const displacementScale = animation
-    ? mapRange(animation.scale, 1, 100, 20, 100)
+    ? mapRange(animation.scale, 1, 100, 10, 40) // was 20,100
     : 0;
   const animationDuration = animation
-    ? mapRange(animation.speed, 1, 100, 1000, 50)
+    ? mapRange(animation.speed, 1, 100, 600, 50) // lower min/max for faster animation
     : 1;
 
   useEffect(() => {
@@ -75,7 +78,7 @@ export function Etheral({
         width: "100%",
         height: "100%",
         background: "#111", // force dark background
-        color:"#fff",
+        color: "#fff",
         ...style,
       }}
     >
@@ -92,14 +95,14 @@ export function Etheral({
               <filter id={id}>
                 <feTurbulence
                   result="undulation"
-                  numOctaves="2"
+                  numOctaves="1" // was 2
                   baseFrequency={`${mapRange(
                     animation.scale,
                     0,
                     100,
                     0.001,
-                    0.0005
-                  )},${mapRange(animation.scale, 0, 100, 0.004, 0.002)}`}
+                    0.0008 // slightly higher for less detail
+                  )},${mapRange(animation.scale, 0, 100, 0.004, 0.003)}`}
                   seed="0"
                   type="turbulence"
                 />
@@ -156,6 +159,22 @@ export function Etheral({
         <h1 className="md:text-7xl text-6xl lg:text-8xl font-uber-medium text-center relative z-20 tracking-wide">
           Parkcade
         </h1>
+        <p className="md:text-2lg text-3lg lg:text-4lg font-oddlini-light tracking-wider">
+          Parking app for users
+        </p>
+        {/* <AnimatedShinyText>Hello</AnimatedShinyText> */}
+        <div className="z-10 flex items-center justify-center">
+          <div
+            className={cn(
+              "group rounded-full border border-black/5 bg-neutral-100 text-base text-white transition-all ease-in hover:cursor-pointer hover:bg-neutral-200 dark:border-white/5 dark:bg-neutral-900 dark:hover:bg-neutral-800"
+            )}
+          >
+            <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
+              <span>✨ Park here</span>
+              <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
+            </AnimatedShinyText>
+          </div>
+        </div>
       </div>
       {noise && noise.opacity > 0 && (
         <div
