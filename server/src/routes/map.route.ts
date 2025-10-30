@@ -2,8 +2,7 @@ import { createCoords, deleteLoc, getAllLocations, getLocations, removeEditorAcc
 import { verifyAccess, verifyOwnerAccess } from '@/middleware/access.middleware';
 import { verifyUserToken } from '@/middleware/auth.middleware';
 
-import Router from 'express';
-
+import { Router } from 'express';
 const route = Router();
 
 route.post('/location',verifyUserToken,createCoords);

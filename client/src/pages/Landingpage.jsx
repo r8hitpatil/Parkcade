@@ -21,7 +21,8 @@ const Landingpage = () => {
       <section id="contact" className="h-screen w-full scroll-mt-20">
         <FeaturesSectionWithHoverEffects />
       </section>
-      <GradualBlurMemo
+      <div className="fixed bottom-0 right-0 w-full z-20">
+        <GradualBlurMemo
         target="parent"
         position="bottom"
         height="2rem"
@@ -31,6 +32,7 @@ const Landingpage = () => {
         exponential={true}
         opacity={1}
       />
+      </div>
     </div>
   );
 };

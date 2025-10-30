@@ -67,7 +67,7 @@ export const loginUser: RequestHandler = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    res.cookie("token", jwtSign, { httpOnly: true , secure: process.env.NODE_ENV === "production" ,sameSite: "strict" },);
+    res.cookie("token", jwtSign, { httpOnly: true , secure: process.env.NODE_ENV === "production" ,sameSite: "lax" ,maxAge: 60 * 60 * 1000});
     return res
       .status(200)
       .json({ message: "Login successful", user: { id, name, email } });
@@ -84,5 +84,19 @@ export const logoutUser: RequestHandler = async (req, res) => {
   } catch (error:unknown) {
     console.error("Error", error);
     return res.status(500).json({ msg: "Internal server error" });
+  }
+};
+
+export const verifyToken:RequestHandler = async(req, res,next) => {
+  const token = req.cookies.token; // 👈 read from cookie
+
+  if (!token) return res.status(401).json({ message: 'No token' });
+
+  try {
+    const decoded = jwt.verify(token,env.JWT_TOKEN )  as { id:string,email:string,name:string };
+    req.user = decoded;
+    next();
+  } catch (err) {
+    return res.status(403).json({ message: 'Invalid token' });
   }
 };

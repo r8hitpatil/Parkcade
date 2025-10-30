@@ -1,66 +1,60 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ShinyButton } from "@/components/ui/shiny-button";
 import { RainbowButton } from "@/components/ui/rainbow-button";
 import { ShimmerButton } from "@/components/ui/shimmer-button";
-import { Link, useNavigate } from "react-router-dom";
-import { useAuthContext } from "@/context/AuthContext";
+import { Link } from "react-router-dom";
 
-export default function Login() {
+export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuthContext();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const { isAuthenticated } = useAuthContext();
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
-    try {
-      await login(email, password);
-      navigate("/home"); // Redirect to home or dashboard after login
-    } catch (err) {
-      setError("Invalid email or password");
-    }
-  };
-
-  useEffect(() => {
-    if(isAuthenticated){
-      navigate("/home",{replace:true});
-    }
-  },[isAuthenticated,navigate])
 
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="flex flex-1 flex-col justify-center px-4 py-10 lg:px-6">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
           <h3 className="text-center text-5xl font-semibold text-foreground dark:text-foreground font-oddlini tracking-wider">
-            Welcome Back
+            Signup
           </h3>
           <p className="text-center text-sm text-muted-foreground dark:text-muted-foreground font-oddlini-light tracking-wider">
-            Enter your credentials to access your account.
+            Enter your details to create account.
           </p>
-          <form onSubmit={handleSubmit} action="#" method="post" className="mt-6 space-y-4">
+          <form action="#" method="post" className="mt-6 space-y-4">
             <div>
               <Label
-                htmlFor="email"
+                htmlFor="email-login-03"
+                className="text-sm font-medium text-foreground dark:text-foreground font-oddlini tracking-wider"
+              >
+                Name
+              </Label>
+              <Input
+                type="name"
+                id="email-login-03"
+                name="email-login-03"
+                autoComplete="email"
+                placeholder="John Doe"
+                className="mt-2 font-oddlini-light tracking-wider"
+              />
+            </div>
+            <div>
+              <Label
+                htmlFor="email-login-03"
                 className="text-sm font-medium text-foreground dark:text-foreground font-oddlini tracking-wider"
               >
                 Email
               </Label>
               <Input
                 type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                id="email-login-03"
+                name="email-login-03"
+                autoComplete="email"
                 placeholder="johndoe@gmail.com"
                 className="mt-2 font-oddlini-light tracking-wider"
               />
             </div>
             <div>
               <Label
-                htmlFor="password"
+                htmlFor="password-login-03"
                 className="text-sm font-medium text-foreground dark:text-foreground font-oddlini tracking-wider"
               >
                 Password
@@ -68,8 +62,9 @@ export default function Login() {
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="password-login-03"
+                  name="password-login-03"
+                  autoComplete="password"
                   placeholder="**************"
                   className="mt-2 font-oddlini-light tracking-wider pr-10"
                 />
@@ -125,11 +120,11 @@ export default function Login() {
               type="submit"
               className="mt-4 w-full py-2 font-oddlini tracking-wider"
             >
-              SIGN IN
+              SIGN UP
             </RainbowButton>
-            <Link to="/signup">
+            <Link to="/login">
               <ShimmerButton className="w-full font-oddlini tracking-wider">
-                SIGN UP
+                SIGN IN
               </ShimmerButton>
             </Link>
           </form>
