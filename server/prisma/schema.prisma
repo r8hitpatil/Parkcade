@@ -27,4 +27,12 @@ model Location {
   createdAt DateTime @default(now())
   ownerId String
   owner User @relation(fields: [ownerId],references: [id])
+  timeSlots TimeDuration[]
+}
+
+model TimeDuration{
+  timeId String @id @default(uuid())
+  locationId  String
+  location    Location  @relation(fields: [locationId], references: [id])
+  timeIs DateTime
 }

@@ -4,7 +4,7 @@ import { RequestHandler } from "express";
 
 export const getAllLocations: RequestHandler = async (req, res) => {
   try {
-    const allLocations = await prisma.location.findMany({});
+    const allLocations = await prisma.location.findMany({include:{timeSlots:true}});
 
     return res.status(200).json({
       message: "All locations fetched successfully",
@@ -41,15 +41,23 @@ export const getLocations: RequestHandler = async (req, res) => {
 
 export const createCoords: RequestHandler = async (req, res) => {
   try {
-    const { location } = req.body;
-    if (!location) {
+    const { location,timeSlots } = req.body;
+    if (!location || !timeSlots || !Array.isArray(timeSlots)) {
       return res.status(401).json({ message: "Enter essential co-ordinates" });
     }
     const newCoord = await prisma.location.create({
       data: {
         location: location,
+        timeSlots: {
+          create: timeSlots.map((time: string) => ({
+            timeIs: new Date(time),
+          })),
+        },
         ownerId: req.user!.id,
       },
+      include:{
+        timeSlots:true
+      }
     });
     if (!newCoord) {
       return res.status(404).json({ message: "Error creating new location" });
@@ -91,7 +99,7 @@ export const updateCoords: RequestHandler = async (req, res) => {
       },
     });
     if (!updateLoc) {
-      return res.status(401).json({ message: "Unable to update user" });
+      return res.status(401).json({ message: "Unable to update location" });
     }
     return res.status(200).json({ message: "Successfully updated", updateLoc });
   } catch (error) {

@@ -1,6 +1,5 @@
 import { Request, Response, Router } from 'express'
 import { signupUser , loginUser, logoutUser, verifyToken } from '@/controller/user.controller';
-import { verifyAccess } from '@/middleware/access.middleware';
 
 const route = Router();
 
