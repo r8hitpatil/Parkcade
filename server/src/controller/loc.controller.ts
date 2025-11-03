@@ -18,7 +18,7 @@ export const getAllLocations: RequestHandler = async (req, res) => {
 
 export const getLocations: RequestHandler = async (req, res) => {
   try {
-    const allowedLocations = await prisma.location.findMany({});
+    const allowedLocations = await prisma.location.findMany({include:{timeSlots:true}});
     if (!allowedLocations) {
       return res.status(401).json({ message: "Locations not found" });
     }
