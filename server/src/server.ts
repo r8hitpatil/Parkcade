@@ -7,6 +7,7 @@ import mapRoutes from "@routes/map.route";
 import dotenv from  'dotenv';
 import cors from 'cors';
 import timeRoutes from "./routes/time.route";
+import bookingRoutes from "./routes/booking.routes";
 
 dotenv.config();
 const app = express();
@@ -22,5 +23,6 @@ app.use(cookieParser());
 app.use('/user',userRoutes);
 app.use('/loc',mapRoutes);
 app.use('/time',timeRoutes);
+app.use('/book',bookingRoutes);
 
 export default app;

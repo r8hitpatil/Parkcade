@@ -1,4 +1,4 @@
-import { createCoords, deleteLoc, getAllLocations, getLocations, removeEditorAccess, roleEdit, updateCoords } from '@/controller/loc.controller';
+import { createCoords, deleteLoc, getAllLocations, getAllEditorsForUser, getLocations, removeEditorAccess, roleEdit, updateCoords, updatePricing } from '@/controller/loc.controller';
 import { verifyAccess, verifyOwnerAccess } from '@/middleware/access.middleware';
 import { verifyUserToken } from '@/middleware/auth.middleware';
 
@@ -9,10 +9,12 @@ route.post('/location',verifyUserToken,createCoords);
 route.get('/locations',verifyUserToken,getLocations);
 route.get('/all-locations',verifyUserToken,getAllLocations);
 route.put('/:id/update-location',verifyUserToken,verifyAccess,updateCoords);
+route.put('/:id/update-price',verifyUserToken,verifyAccess,updatePricing);
 route.delete('/:id/delete-location',verifyUserToken,verifyAccess,deleteLoc);
 route.post('/:id/access',verifyUserToken,verifyOwnerAccess,roleEdit);
 route.post('/:id/remove-access',verifyUserToken,verifyOwnerAccess,removeEditorAccess);
 
+route.get('/getEditor',verifyUserToken,getAllEditorsForUser);
 const mapRoutes = route;
 
 export default mapRoutes;
