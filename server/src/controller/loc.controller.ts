@@ -1,14 +1,23 @@
 import { prisma } from "@/server";
 import { env } from "@/utils/env";
 import { fgaClient } from "@/utils/openFG";
+import redis from "@/utils/redis-client";
 import { RequestHandler } from "express";
 
 export const getAllLocations: RequestHandler = async (req, res) => {
   try {
+    const cachedLocations = await redis.get("locations");
+    if (cachedLocations) {
+      const cache = JSON.parse(cachedLocations);
+      return res.status(200).json({
+        message: "All locations fetched successfully(cache)",
+        data: cache,
+      });
+    }
     const allLocations = await prisma.location.findMany({
       include: { timeSlots: true },
     });
-
+    await redis.set("locations", JSON.stringify(allLocations), "EX", 120);
     return res.status(200).json({
       message: "All locations fetched successfully",
       data: allLocations,
@@ -21,8 +30,17 @@ export const getAllLocations: RequestHandler = async (req, res) => {
 
 export const getLocations: RequestHandler = async (req, res) => {
   try {
+    const cachedLocations = await redis.get(
+      `personalLocations:${req.user!.id}`
+    );
+    if (cachedLocations) {
+      const allowed = JSON.parse(cachedLocations);
+      return res
+        .status(200)
+        .json({ message: "(Cache) Locations are : ", allowed });
+    }
     const allowedLocations = await prisma.location.findMany({
-      include: { timeSlots: true },
+      include: { timeSlots: true,bookings:true},
     });
     if (!allowedLocations) {
       return res.status(401).json({ message: "Locations not found" });
@@ -35,8 +53,14 @@ export const getLocations: RequestHandler = async (req, res) => {
     const allowedFields = sortedLocations.objects.map(
       (obj) => obj.split(":")[1]
     );
-    const allowed = allowedLocations.filter((location) =>
+    const allowed = allowedLocations.filter((location:any) =>
       allowedFields.includes(location.id)
+    );
+    await redis.set(
+      `personalLocations:${req.user!.id}`,
+      JSON.stringify(allowed),
+      "EX",
+      60
     );
     return res.status(200).json({ message: "Locations are : ", allowed });
   } catch (error) {
@@ -77,6 +101,14 @@ export const createCoords: RequestHandler = async (req, res) => {
         },
       ],
     });
+    await redis.set(
+      `location:${newCoord.id}`,
+      JSON.stringify(newCoord),
+      "EX",
+      60
+    );
+    await redis.del("locations");
+    await redis.del(`personalLocations:${req.user!.id}`);
     return res
       .status(201)
       .json({ message: "Location created", data: newCoord });
@@ -107,6 +139,9 @@ export const updateCoords: RequestHandler = async (req, res) => {
     if (!updateLoc) {
       return res.status(401).json({ message: "Unable to update location" });
     }
+    await redis.set(`location:${id}`, JSON.stringify(updateLoc), "EX", 60);
+    await redis.del("locations");
+    await redis.del(`personalLocations:${req.user!.id}`);
     return res.status(200).json({ message: "Successfully updated", updateLoc });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
@@ -140,7 +175,9 @@ export const deleteLoc: RequestHandler = async (req, res) => {
     if (!deleteLocation) {
       return res.status(401).json({ message: "Unable to delete location" });
     }
-
+    await redis.del("locations");
+    await redis.del(`location:${id}`);
+    await redis.del(`personalLocations:${req.user!.id}`);
     return res
       .status(200)
       .json({ message: "Successfully deleted", deleteLocation });
@@ -214,14 +251,14 @@ export const removeEditorAccess: RequestHandler = async (req, res) => {
     const userKey = `user:${user.id}`;
     const objectKey = `location:${id}`;
 
-    // ✅ Check if user is already viewer
+    // Check if user is already viewer
     const viewerCheck = await fgaClient.check({
       user: userKey,
       relation: "viewer",
       object: objectKey,
     });
 
-    // ✅ Check if user is currently editor
+    // Check if user is currently editor
     const editorCheck = await fgaClient.check({
       user: userKey,
       relation: "editor",
@@ -288,6 +325,9 @@ export const updatePricing: RequestHandler = async (req, res) => {
     if (!updatedPrice) {
       return res.status(401).json({ message: "Unable to update Price" });
     }
+    await redis.set(`location:${id}`, JSON.stringify(updatedPrice), "EX", 60);
+    await redis.del("locations");
+    await redis.del(`personalLocations:${req.user!.id}`);
     return res
       .status(200)
       .json({ message: "Successfully updated", updatedPrice });
@@ -313,13 +353,13 @@ export const getAllEditorsForUser: RequestHandler = async (req, res) => {
 
     const allowedIds = accessible.objects.map((obj) => obj.split(":")[1]);
 
-    const allowedLocations = allLocations.filter((loc) =>
+    const allowedLocations = allLocations.filter((loc:any) =>
       allowedIds.includes(loc.id)
     );
 
-    // Step 2: For each allowed location, list all its editors (excluding owner)
+    // For each allowed location, list all its editors (excluding owner)
     const editorsByLocation = await Promise.all(
-      allowedLocations.map(async (loc) => {
+      allowedLocations.map(async (loc:any) => {
         const response = await fgaClient.listUsers(
           {
             object: {
@@ -354,11 +394,10 @@ export const getAllEditorsForUser: RequestHandler = async (req, res) => {
         return {
           locationId: loc.id,
           location: loc.location,
-          editors:editorDetails,
+          editors: editorDetails,
         };
       })
     );
-
     return res.status(200).json({
       message: "Editors (excluding owners) for each accessible location",
       data: editorsByLocation,

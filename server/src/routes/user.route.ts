@@ -6,7 +6,6 @@ const route = Router();
 route.post('/signup', signupUser);
 route.post('/login', loginUser);
 route.post('/logout',logoutUser);
-// testing purpose
 route.get('/me',verifyToken,(req,res) => {
     res.json({ user : req.user })
 })

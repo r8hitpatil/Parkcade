@@ -1,4 +1,5 @@
 import { prisma } from "@/server";
+import redis from "@/utils/redis-client";
 import { RequestHandler } from "express"; 
 
 export const addSlot:RequestHandler = async (req,res) => {
@@ -24,8 +25,13 @@ export const addSlot:RequestHandler = async (req,res) => {
     if (!newSlot) {
       return res.status(401).json({ message: "Unable to add time slot" });
     }
-    
-    return res.status(201).json({ message: "Time slot added successfully", data: newSlot });
+    await redis.del(`personalLocations:${req.user?.id}`);
+    await redis.set(`slot:${newSlot.id}`, JSON.stringify(newSlot), "EX", 120);
+    return res.status(201).json({ 
+      message: "Time slot added successfully", 
+      data: newSlot // Make sure this contains the full slot object with id
+    });
+
   } catch (error) {
     console.error("Error adding time slot:", error);
     return res.status(500).json({ message: "Server error" });
@@ -53,6 +59,9 @@ export const updateTime: RequestHandler = async (req, res) => {
     if (!updated) {
       return res.status(401).json({ message: "Unable to update time" });
     }
+    await redis.set(`slots:${timeId}`, JSON.stringify(updated), "EX", 120);
+    await redis.del('slots');
+    await redis.del(`personalLocations:${req.user?.id}`);
     return res.status(200).json({ message: "Successfully updated", updated });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
@@ -76,6 +85,8 @@ export const deleteSlot:RequestHandler = async (req,res) => {
     if (!deleted) {
       return res.status(401).json({ message: "Unable to delete slot" });
     }
+    await redis.del("slots");
+    await redis.del(`personalLocations:${req.user?.id}`);
     return res.status(200).json({ message: "Successfully deleted", deleted });
   } catch (error) {
   }
@@ -83,6 +94,14 @@ export const deleteSlot:RequestHandler = async (req,res) => {
 
 export const getSlots:RequestHandler = async (req,res) => {
   try {
+    const cachedBookings = await redis.get(`slots`);
+    if(cachedBookings){
+      const cache = JSON.parse(cachedBookings);
+      return res.status(200).json({
+        message: "Fetched all locations (cache)",
+        getBookings:cache,
+      })
+    }
     const { id } = req.params;
     if (!id) {
       return res.status(400).json({ message: "Enter complete details" });
@@ -95,6 +114,7 @@ export const getSlots:RequestHandler = async (req,res) => {
         locationId:id
       },
     })
+    await redis.set("slots", JSON.stringify(getSlots), "EX", 120);
     return res.status(200).json({ message : "Time slots",getSlots});
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
@@ -134,10 +154,16 @@ export const getSlots:RequestHandler = async (req,res) => {
 //     return res.status(500).json({ message: "Server error." });
 //   }
 // };
-// ...existing code...
-
 export const getTimeSlot: RequestHandler = async (req, res) => {
   try {
+    const cachedSlots = await redis.get('slots');
+    if(cachedSlots){
+      const cache = JSON.parse(cachedSlots);
+      return res.status(200).json({
+        message: "Time slots fetched", 
+        getSlots: cache
+      })
+    }
     const { id } = req.params;
     
     if(!id){
@@ -157,12 +183,13 @@ export const getTimeSlot: RequestHandler = async (req, res) => {
     });
 
     // Add isBooked flag to each slot
-    const slotsWithStatus = getSlots.map(slot => ({
+    const slotsWithStatus = getSlots.map((slot:any) => ({
       id: slot.id,
       timeIs: slot.timeIs,
       locationId: slot.locationId,
       isBooked: slot.bookings.length > 0
     }));
+    await redis.set('slots',JSON.stringify(slotsWithStatus),"EX",60);
 
     return res.status(200).json({ 
       message: "Time slots fetched", 
@@ -173,5 +200,3 @@ export const getTimeSlot: RequestHandler = async (req, res) => {
     return res.status(500).json({ message: "Server error." });
   }
 };
-
-// ...existing code...

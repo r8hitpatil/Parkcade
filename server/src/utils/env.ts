@@ -8,7 +8,10 @@ export const env = createEnv({
     FGA_STORE_ID: z.string().min(1),
     FGA_MODEL_ID: z.string().min(1),
     RAZORPAY_KEY_ID: z.string().min(1),
-    RAZORPAY_KEY_TOKEN: z.string().min(1)
+    RAZORPAY_KEY_TOKEN: z.string().min(1),
+    REDIS_HOST: z.string().min(1),
+    REDIS_PORT: z.coerce.number(),
+    REDIS_PASSWORD: z.string().min(1),
   },
   runtimeEnvStrict: {
     JWT_TOKEN: process.env.JWT_TOKEN,
@@ -16,6 +19,9 @@ export const env = createEnv({
     FGA_STORE_ID: process.env.FGA_STORE_ID,
     FGA_MODEL_ID: process.env.FGA_MODEL_ID,
     RAZORPAY_KEY_ID: process.env.RAZORPAY_KEY_ID,
-    RAZORPAY_KEY_TOKEN: process.env.RAZORPAY_KEY_TOKEN
+    RAZORPAY_KEY_TOKEN: process.env.RAZORPAY_KEY_TOKEN,
+    REDIS_HOST:process.env.REDIS_HOST,
+    REDIS_PORT:process.env.REDIS_PORT,
+    REDIS_PASSWORD:process.env.REDIS_PASSWORD
   },
 });

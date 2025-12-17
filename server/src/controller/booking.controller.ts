@@ -3,6 +3,7 @@ import { RequestHandler } from "express";
 import { prisma } from "@/server";
 import crypto from "crypto";
 import { env } from "@/utils/env";
+import redis from "@/utils/redis-client";
 
 export const createBooking: RequestHandler = async (req, res) => {
   try {
@@ -140,6 +141,14 @@ export const verifyPayment: RequestHandler = async (req, res) => {
 
 export const getBookingTemplates: RequestHandler = async (req, res) => {
   try {
+    const cachedBookings = await redis.get("bookings:available");
+    if(cachedBookings){
+      const cache = JSON.parse(cachedBookings);
+      return res.status(200).json({
+        message: "Fetched all locations (cache)",
+      getAll: cache,
+      })
+    }
     const getAll = await prisma.location.findMany({
       include: {
         timeSlots: {
@@ -156,15 +165,16 @@ export const getBookingTemplates: RequestHandler = async (req, res) => {
     });
 
     // Add isBooked flag to each slot
-    const locationsWithStatus = getAll.map(location => ({
+    const locationsWithStatus = getAll.map((location:any) => ({
       ...location,
-      timeSlots: location.timeSlots.map(slot => ({
+      timeSlots: location.timeSlots.map((slot:any) => ({
         id: slot.id,
         timeIs: slot.timeIs,
         locationId: slot.locationId,
         isBooked: slot.bookings.length > 0,
       }))
     }));
+    await redis.set('bookings:available',JSON.stringify(locationsWithStatus),"EX",60);
 
     return res.status(200).json({
       message: "Fetched all locations",
@@ -178,6 +188,14 @@ export const getBookingTemplates: RequestHandler = async (req, res) => {
 
 export const yourBookings: RequestHandler = async (req, res) => {
   try {
+    const cachedBookings = await redis.get(`bookings:${req.user?.id}`);
+    if(cachedBookings){
+      const cache = JSON.parse(cachedBookings);
+      return res.status(200).json({
+        message: "Fetched all locations (cache)",
+        getBookings:cache,
+      })
+    }
     const userID = req.user?.id;
     if (!userID) {
       return res
@@ -192,6 +210,7 @@ export const yourBookings: RequestHandler = async (req, res) => {
     if (!getBookings) {
       return res.status(400).json({ message: "Could fetch bookings" });
     }
+    await redis.set(`bookings:${req.user?.id}`,JSON.stringify(getBookings),"EX",60);
     return res.status(200).json({ message: "Fetched bookings", getBookings });
   } catch (error) {
     return res.status(500).json({ message: "Server error." });

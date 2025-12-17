@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,47 +8,47 @@ datasource db {
 }
 
 model User {
-  id        String      @id @default(uuid())
+  id        String     @id @default(uuid())
   name      String
-  email     String      @unique
+  email     String     @unique
   password  String
-  locations Location[]
   bookings  Booking[]
+  locations Location[]
 }
 
 model Location {
-  id         String         @id @default(uuid())
-  location   String
-  pricing    Float
-  createdAt  DateTime        @default(now())
-  ownerId    String
-  owner      User            @relation(fields: [ownerId], references: [id])
-  timeSlots  TimeDuration[]
-  bookings   Booking[]
+  id        String         @id @default(uuid())
+  location  String
+  pricing   Float
+  createdAt DateTime       @default(now())
+  ownerId   String
+  bookings  Booking[]
+  owner     User           @relation(fields: [ownerId], references: [id])
+  timeSlots TimeDuration[]
 }
 
 model TimeDuration {
-  id          String      @id @default(uuid())
-  timeIs   DateTime
-  locationId  String
-  location    Location    @relation(fields: [locationId], references: [id])
-  bookings    Booking[]
+  id         String    @id @default(uuid())
+  timeIs     DateTime
+  locationId String
+  bookings   Booking[]
+  location   Location  @relation(fields: [locationId], references: [id])
 }
 
 model Booking {
-  id             String       @id @default(uuid())
-  userId         String
-  user           User         @relation(fields: [userId], references: [id])
-  locationId     String
-  location       Location     @relation(fields: [locationId], references: [id])
-  timeSlotId     String
-  timeSlot       TimeDuration @relation(fields: [timeSlotId], references: [id])
-  amount         Float
-  paymentStatus  PaymentStatus @default(PENDING)
-  razorpayOrderId String? @unique
+  id                String        @id @default(uuid())
+  userId            String
+  locationId        String
+  timeSlotId        String
+  amount            Float
+  paymentStatus     PaymentStatus @default(PENDING)
+  razorpayOrderId   String?       @unique
   razorpayPaymentId String?
-  isBooked       Boolean       @default(false)
-  createdAt      DateTime      @default(now())
+  isBooked          Boolean       @default(false)
+  createdAt         DateTime      @default(now())
+  location          Location      @relation(fields: [locationId], references: [id])
+  timeSlot          TimeDuration  @relation(fields: [timeSlotId], references: [id])
+  user              User          @relation(fields: [userId], references: [id])
 }
 
 enum PaymentStatus {

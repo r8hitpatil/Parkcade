@@ -6,12 +6,17 @@ import cookieParser from 'cookie-parser';
 import mapRoutes from "@routes/map.route";
 import dotenv from  'dotenv';
 import cors from 'cors';
-import timeRoutes from "./routes/time.route";
-import bookingRoutes from "./routes/booking.routes";
+import timeRoutes from "@routes/time.route";
+import bookingRoutes from "@routes/booking.routes";
+import redis from "@utils/redis-client";
 
 dotenv.config();
 const app = express();
 export const prisma = new PrismaClient();
+
+redis.on('connect',() => {
+  console.log('Redis connected')
+})
 
 app.use(cors({
   origin: 'http://localhost:5173',

@@ -3,7 +3,6 @@ import { compareSync, genSaltSync, hashSync } from "bcrypt-ts";
 import { prisma } from "@/server";
 import jwt from "jsonwebtoken";
 import { env } from "@/utils/env";
-import { fgaClient } from "@/utils/openFG";
 
 const salt = genSaltSync(10);
 

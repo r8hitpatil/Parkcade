@@ -1,0 +1,25 @@
+.git
+.gitignore
+node_modules
+npm-debug.log
+.yarn
+.vscode
+.idea
+
+# Env/secrets (don’t bake into image)
+.env
+.env.*
+
+# Tests, coverage, local caches
+coverage
+.nyc_output
+tmp
+.cache
+.turbo
+
+# Platform-specific prisma engine (avoid Windows DLLs in Linux image)
+src/generated/
+**/*.node
+
+# Optional: if you copy compiled output only, exclude source (adjust per your Dockerfile)
+# src
